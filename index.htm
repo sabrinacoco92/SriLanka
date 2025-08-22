@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diario di Viaggio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+        .entry-card {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-5xl font-bold text-slate-700 mb-4">🇱🇰 Sri Lanka Chronicles</h1>
+            <p class="text-xl text-slate-600">Scrivi quello che ti pare sul viaggio (e sui compagni di viaggio)</p>
+        </div>
+
+        <!-- Form Section -->
+        <div class="max-w-2xl mx-auto mb-12">
+            <div class="entry-card rounded-2xl p-8 shadow-2xl">
+                <h2 class="text-2xl font-semibold text-slate-700 mb-6 text-center">Spara il tuo commento</h2>
+                
+                <form id="travelForm" class="space-y-6">
+                    <!-- Nome (opzionale) -->
+                    <div>
+                        <label for="nome" class="block text-sm font-medium text-slate-600 mb-2">
+                            Chi sei? (opzionale - puoi rimanere anonimo)
+                        </label>
+                        <input type="text" id="nome" name="nome" 
+                               placeholder="Il tuo nome o lascia vuoto per restare nell'ombra"
+                               class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent transition-all duration-200">
+                    </div>
+
+                    <!-- Luogo -->
+                    <div>
+                        <label for="luogo" class="block text-sm font-medium text-slate-600 mb-2">
+                            Dove siamo finiti oggi? *
+                        </label>
+                        <input type="text" id="luogo" name="luogo" required
+                               placeholder="Es. Kandy, Colombo, in mezzo al nulla..."
+                               class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent transition-all duration-200">
+                    </div>
+
+                    <!-- Data -->
+                    <div>
+                        <label for="data" class="block text-sm font-medium text-slate-600 mb-2">
+                            Quando è successo? *
+                        </label>
+                        <input type="date" id="data" name="data" required
+                               class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent transition-all duration-200">
+                    </div>
+
+                    <!-- Commento -->
+                    <div>
+                        <label for="commento" class="block text-sm font-medium text-slate-600 mb-2">
+                            Cosa è successo? Spettegola pure *
+                        </label>
+                        <textarea id="commento" name="commento" rows="6" required
+                                  placeholder="Racconta tutto: chi ha fatto cosa, chi si è perso, chi ha mangiato troppo piccante, chi russa..."
+                                  class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent transition-all duration-200 resize-none"></textarea>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" 
+                            class="w-full bg-gradient-to-r from-slate-500 to-slate-600 text-white font-semibold py-4 px-6 rounded-lg hover:from-slate-600 hover:to-slate-700 transform hover:scale-105 transition-all duration-200 shadow-lg">
+                        📝 Manda il gossip
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Entries Display -->
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-3xl font-bold text-slate-700 text-center mb-8">I pettegolezzi del gruppo</h2>
+            <div id="entriesContainer" class="space-y-6">
+                <!-- Le esperienze verranno aggiunte qui -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Array per memorizzare le esperienze
+        let travelEntries = [];
+
+        // Riferimenti agli elementi
+        const form = document.getElementById('travelForm');
+        const entriesContainer = document.getElementById('entriesContainer');
+
+        // Gestione invio form
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Raccolta dati dal form
+            const nome = document.getElementById('nome').value.trim() || 'Anonimo';
+            const luogo = document.getElementById('luogo').value.trim();
+            const data = document.getElementById('data').value;
+            const commento = document.getElementById('commento').value.trim();
+
+            // Validazione
+            if (!luogo || !data || !commento) {
+                alert('Per favore compila tutti i campi obbligatori!');
+                return;
+            }
+
+            // Creazione nuova esperienza
+            const newEntry = {
+                id: Date.now(),
+                nome: nome,
+                luogo: luogo,
+                data: data,
+                commento: commento,
+                timestamp: new Date()
+            };
+
+            // Aggiunta all'array
+            travelEntries.unshift(newEntry);
+
+            // Aggiornamento display
+            displayEntries();
+
+            // Reset form
+            form.reset();
+
+            // Messaggio di conferma
+            showSuccessMessage();
+        });
+
+        // Funzione per mostrare le esperienze
+        function displayEntries() {
+            if (travelEntries.length === 0) {
+                entriesContainer.innerHTML = `
+                    <div class="text-center text-slate-500 py-12">
+                        <p class="text-xl">Ancora nessun pettegolezzo...</p>
+                        <p class="text-lg mt-2">Dai, qualcuno deve pur aver fatto qualcosa di imbarazzante! 😏</p>
+                    </div>
+                `;
+                return;
+            }
+
+            entriesContainer.innerHTML = travelEntries.map(entry => `
+                <div class="entry-card rounded-xl p-6 shadow-lg transform hover:scale-105 transition-all duration-200">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-xl font-semibold text-slate-700">${escapeHtml(entry.nome)}</h3>
+                            <p class="text-slate-500 font-medium">📍 ${escapeHtml(entry.luogo)}</p>
+                        </div>
+                        <span class="text-sm text-slate-400 bg-slate-100 px-3 py-1 rounded-full">
+                            ${formatDate(entry.data)}
+                        </span>
+                    </div>
+                    <p class="text-slate-600 leading-relaxed">${escapeHtml(entry.commento)}</p>
+                    <div class="mt-4 pt-4 border-t border-slate-200">
+                        <span class="text-xs text-slate-400">
+                            Postato ${getTimeAgo(entry.timestamp)}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Funzione per mostrare messaggio di successo
+        function showSuccessMessage() {
+            const message = document.createElement('div');
+            message.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300';
+            message.textContent = '✅ Gossip pubblicato!';
+            document.body.appendChild(message);
+
+            setTimeout(() => {
+                message.classList.remove('translate-x-full');
+            }, 100);
+
+            setTimeout(() => {
+                message.classList.add('translate-x-full');
+                setTimeout(() => {
+                    document.body.removeChild(message);
+                }, 300);
+            }, 3000);
+        }
+
+        // Funzioni di utilità
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('it-IT', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        function getTimeAgo(timestamp) {
+            const now = new Date();
+            const diff = now - timestamp;
+            const minutes = Math.floor(diff / 60000);
+            
+            if (minutes < 1) return 'proprio ora';
+            if (minutes < 60) return `${minutes} minuti fa`;
+            
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `${hours} ore fa`;
+            
+            const days = Math.floor(hours / 24);
+            return `${days} giorni fa`;
+        }
+
+        // Inizializzazione
+        displayEntries();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97327405a71492f9',t:'MTc1NTg2NjU3OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
